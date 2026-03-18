@@ -1,14 +1,14 @@
-## ⚙️ Arquitectura del Sistema y Flujo de Datos (Serverless)
+Arquitectura y flujo de datos
 
-El proyecto utiliza una arquitectura *Serverless* y *Low-Code* basada íntegramente en el ecosistema de Google Workspace. Esto elimina la necesidad de servidores externos y reduce la latencia de actualización a escasos segundos. El flujo se compone de las siguientes etapas:
+Este proyecto funciona con una arquitectura serverless y low-code basada por completo en el ecosistema de Google. Al no depender de servidores externos, la latencia es mínima y los datos se actualizan en un par de segundos. El proceso paso a paso es el siguiente:
 
-1. **Interacción del Usuario (Frontend):** A través de la interfaz móvil construida en **AppSheet**, el usuario digita el parámetro de búsqueda (ej. "Real Madrid") en un formulario de consulta.
-2. **Actualización de Base de Datos:** AppSheet registra instantáneamente este parámetro en una celda específica de la hoja de control en **Google Sheets** (nuestra base de datos relacional).
-3. **Ejecución del Motor Lógico (Backend):** Un *Trigger* (Gatillo) activa un script nativo en **Google Apps Script** (basado en JavaScript). Este script lee el parámetro ingresado y realiza una petición HTTP autenticada (GET) a **The Odds API**.
-4. **Extracción y Transformación (ETL):** El script procesa la respuesta en formato JSON en tiempo real, filtra los partidos para encontrar al equipo objetivo, aísla las cuotas de las 5 casas de apuestas seleccionadas y las estructura en un arreglo bidimensional (Matriz).
-5. **Escritura y Sincronización (UI):** Apps Script sobrescribe la hoja de "Resultados" con los datos limpios. AppSheet detecta este cambio en la base de datos de forma nativa y actualiza la vista del usuario, mostrando la tabla comparativa en la pantalla del celular.
+- Interfaz: El usuario escribe el nombre del equipo a buscar en la aplicación hecha con AppSheet.
+- Base de datos: AppSheet guarda esa palabra inmediatamente en una celda de control dentro de Google Sheets.
+- Lógica backend: Ese cambio dispara un código escrito en Google Apps Script. El script lee la celda y hace una petición a The Odds API.
+- Procesamiento de datos: El código recibe la información cruda en formato JSON, busca el partido del equipo, filtra las cuotas de 5 casas de apuestas específicas y arma una tabla ordenada.
+- Actualización visual: Apps Script pega esa tabla limpia en la hoja de resultados. AppSheet detecta la actualización de la hoja de cálculo y muestra la tabla final en la pantalla del usuario.
 
-### 📊 Diagrama de Flujo (Secuencia)
+Diagrama de secuencia
 
 ```mermaid
 sequenceDiagram
@@ -18,10 +18,10 @@ sequenceDiagram
     participant API as 🌐 The Odds API
     participant Result as 📊 Google Sheets (Resultados)
 
-    User->>DB: 1. Ingresa Equipo (ej. "Real Madrid")
-    DB->>Script: 2. Dispara el Trigger de ejecución
-    Script->>API: 3. GET Request (API Key + Deporte)
-    API-->>Script: 4. Retorna JSON con Cuotas en Vivo
-    Note over Script: 5. ETL: Filtrado y armado de matriz
+    User->>DB: 1. Ingresa el equipo
+    DB->>Script: 2. Dispara el código
+    Script->>API: 3. Pide datos a la API
+    API-->>Script: 4. Devuelve JSON con cuotas
+    Note over Script: 5. Filtra y arma la tabla
     Script->>Result: 6. Escribe datos limpios
-    Result-->>User: 7. Sincronización y muestra visual
+    Result-->>User: 7. Actualiza la pantalla
