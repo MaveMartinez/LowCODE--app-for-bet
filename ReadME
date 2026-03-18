@@ -1,13 +1,13 @@
-## ⚙️ Arquitectura del Sistema y Flujo de Datos
+ Arquitectura del Sistema y Flujo de Datos
 
 El proyecto utiliza una arquitectura *Serverless* / Microservicios para garantizar la actualización de datos en tiempo real. El flujo de información desde la petición del usuario hasta la visualización de los datos se compone de 6 etapas:
 
-1. **Interacción del Usuario (Frontend):** A través de la interfaz móvil/web construida en **AppSheet**, el usuario ingresa el parámetro de búsqueda (ej. "Villarreal") y ejecuta la acción de consulta.
-2. **Disparo del Webhook (Trigger):** AppSheet captura el evento y envía una petición HTTP (Webhook) con el parámetro de búsqueda como *payload* hacia nuestro servidor backend desplegado en la nube.
-3. **Consumo de API Externa (Backend):** El servidor (desarrollado en **Python**) recibe el *payload*, asigna la variable de búsqueda y realiza una solicitud autenticada (GET request) a **The Odds API** para obtener las cuotas en vivo.
-4. **Extracción y Transformación (ETL):** El script de Python procesa la respuesta en formato JSON crudo, filtra la información descartando datos innecesarios y estructura las cuotas de las casas de apuestas seleccionadas en un *DataFrame* utilizando la librería **Pandas**.
-5. **Actualización de Base de Datos:** Mediante la **Google Sheets API**, el backend reescribe los datos estructurados directamente en la hoja de cálculo que sirve como base de datos relacional del proyecto.
-6. **Sincronización de Interfaz:** AppSheet detecta automáticamente la alteración en su base de datos subyacente y refresca la vista del cliente, mostrando la tabla comparativa de cuotas en pantalla al instante.
+1. Interacción del Usuario (Frontend): A través de la interfaz móvil/web construida en **AppSheet**, el usuario ingresa el parámetro de búsqueda (ej. "Villarreal") y ejecuta la acción de consulta.
+2. Disparo del Webhook (Trigger): AppSheet captura el evento y envía una petición HTTP (Webhook) con el parámetro de búsqueda como *payload* hacia nuestro servidor backend desplegado en la nube.
+3. Consumo de API Externa (Backend): El servidor (desarrollado en **Python**) recibe el *payload*, asigna la variable de búsqueda y realiza una solicitud autenticada (GET request) a **The Odds API** para obtener las cuotas en vivo.
+4. Extracción y Transformación (ETL): El script de Python procesa la respuesta en formato JSON crudo, filtra la información descartando datos innecesarios y estructura las cuotas de las casas de apuestas seleccionadas en un *DataFrame* utilizando la librería **Pandas**.
+5. Actualización de Base de Datos: Mediante la **Google Sheets API**, el backend reescribe los datos estructurados directamente en la hoja de cálculo que sirve como base de datos relacional del proyecto.
+6. Sincronización de Interfaz: AppSheet detecta automáticamente la alteración en su base de datos subyacente y refresca la vista del cliente, mostrando la tabla comparativa de cuotas en pantalla al instante.
 
 ### 📊 Diagrama de Flujo (Secuencia)
 
