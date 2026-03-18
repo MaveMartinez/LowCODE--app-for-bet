@@ -10,18 +10,10 @@ Este proyecto funciona con una arquitectura serverless y low-code basada por com
 
 Diagrama de secuencia
 
-```mermaid
-sequenceDiagram
-    participant User as 📱 Usuario (AppSheet)
-    participant DB as 📊 Google Sheets (Buscador)
-    participant Script as ⚙️ Google Apps Script
-    participant API as 🌐 The Odds API
-    participant Result as 📊 Google Sheets (Resultados)
-
-    User->>DB: 1. Ingresa el equipo
-    DB->>Script: 2. Dispara el código
-    Script->>API: 3. Pide datos a la API
-    API-->>Script: 4. Devuelve JSON con cuotas
-    Note over Script: 5. Filtra y arma la tabla
-    Script->>Result: 6. Escribe datos limpios
-    Result-->>User: 7. Actualiza la pantalla
+     1. Ingresa el equipo
+     2. Dispara el código
+     3. Pide datos a la API
+     4. Devuelve JSON con cuotas
+     5. Filtra y arma la tabla
+     6. Escribe datos limpios
+     7. Actualiza la pantalla
