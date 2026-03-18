@@ -1,0 +1,68 @@
+function buscarCuotas() {
+  // 1. Nos conectamos a tus hojas de cálculo
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hojaBuscador = ss.getSheetByName("Buscador");
+  var hojaResultados = ss.getSheetByName("Resultados");
+  
+  // 2. Leemos qué equipo escribiste en la celda A2
+  var equipoObjetivo = hojaBuscador.getRange("A2").getValue();
+  if (equipoObjetivo === "") return; // Si está vacío, no hace nada
+  
+  // 3. Credenciales de la API (REEMPLAZA ESTO CON TU CLAVE REAL)
+  var apiKey = "ff4ebdb7dd4d73dfe15d685ddaf5e1d3"; 
+  var deporte = "soccer_spain_la_liga";
+  var url = "https://api.the-odds-api.com/v4/sports/" + deporte + "/odds/?apiKey=" + apiKey + "&regions=eu,uk&markets=h2h";
+  
+  // 4. Hacemos la petición a la API (Equivalente al "requests.get" de Python)
+  var opciones = { "method": "get", "muteHttpExceptions": true };
+  var respuesta = UrlFetchApp.fetch(url, opciones);
+  
+  if (respuesta.getResponseCode() !== 200) {
+    Logger.log("Error al conectar con la API.");
+    return;
+  }
+  
+  // 5. Convertimos el texto en un objeto JSON
+  var datos = JSON.parse(respuesta.getContentText());
+  var casasFavoritas = ["1xBet", "Betsson", "William Hill", "Betway", "Pinnacle"];
+  var filasTabla = [];
+  
+  // 6. Buscamos el partido y estructuramos los datos
+  for (var i = 0; i < datos.length; i++) {
+    var partido = datos[i];
+    
+    // Si el equipo que buscamos está jugando de local o visita
+    if (partido.home_team.includes(equipoObjetivo) || partido.away_team.includes(equipoObjetivo)) {
+      
+      for (var j = 0; j < partido.bookmakers.length; j++) {
+        var casa = partido.bookmakers[j];
+        
+        if (casasFavoritas.includes(casa.title)) {
+          var resultados = casa.markets[0].outcomes;
+          var cuotaLocal = 0, cuotaEmpate = 0, cuotaVisita = 0;
+          
+          // Asignamos las cuotas correctamente sin importar el orden en que vengan
+          for (var k = 0; k < resultados.length; k++) {
+            if (resultados[k].name === partido.home_team) cuotaLocal = resultados[k].price;
+            else if (resultados[k].name === partido.away_team) cuotaVisita = resultados[k].price;
+            else if (resultados[k].name === 'Draw') cuotaEmpate = resultados[k].price;
+          }
+          
+          // Guardamos la fila
+          filasTabla.push([casa.title, cuotaLocal, cuotaEmpate, cuotaVisita]);
+        }
+      }
+      break; // Detenemos la búsqueda al encontrar el primer partido
+    }
+  }
+  
+  // 7. Limpiamos la hoja de resultados anterior (de la fila 2 a la 100)
+  hojaResultados.getRange("A2:D100").clearContent();
+  
+  // 8. Escribimos la tabla nueva directamente en Google Sheets
+  if (filasTabla.length > 0) {
+    hojaResultados.getRange(2, 1, filasTabla.length, 4).setValues(filasTabla);
+  } else {
+    hojaResultados.getRange("A2").setValue("No se encontraron cuotas para este equipo hoy.");
+  }
+}
